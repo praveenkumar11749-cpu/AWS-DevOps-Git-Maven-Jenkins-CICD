@@ -1,10 +1,6 @@
+
 pipeline {
     agent any
-
-    tools {
-        jdk 'Java21'
-        maven 'Maven3'
-    }
 
     stages {
         stage('Checkout') {
@@ -12,19 +8,30 @@ pipeline {
                 checkout scm
             }
         }
+
+        stage('Verify Java and Maven') {
+            steps {
+                sh 'java -version'
+                sh 'mvn -version'
+            }
+        }
+
         stage('Build and Test') {
             steps {
                 sh 'mvn -B clean test'
             }
         }
+
         stage('Package') {
             steps {
                 sh 'mvn -B package -DskipTests'
             }
         }
+
         stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                archiveArtifacts artifacts: 'target/*.jar',
+                                 fingerprint: true
             }
         }
     }
